@@ -11,6 +11,12 @@ const port = process.env.PORT || 3000
 app.use(express.json())
 
 // REST API Endpoints
+const isValidObjectId = (id, res) => {
+    if (!mongoose.isValidObjectId(id)){
+        return res.status(400).send('Invalid ID') 
+    }
+}
+
 // Post new user
 app.post('/users', async (req, res)=> {
     const user = new User(req.body)
@@ -61,7 +67,7 @@ app.patch('/users/:id', async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({ error: 'Invalid updates' })
+        return res.status(400).send({ error: 'Invalid update request' })
     }
 
     if (!mongoose.isValidObjectId(_id)){
@@ -77,7 +83,6 @@ app.patch('/users/:id', async (req, res) => {
         res.status(500).send(e.message)
     }
 })
-
 
 // Post new task
 app.post('/tasks', async (req, res) => {
@@ -117,6 +122,31 @@ app.get('/tasks/:id', async (req, res) => {
     } catch (error) {
         res.status(500).send(error.message)
     }
+})
+
+// Update task by id
+app.patch('/tasks/:id', async (req, res) => {
+    const _id = req.params.id;
+    isValidObjectId(_id, res)
+    
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['description', 'completed']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        res.status(400).send({ error: 'Invalid update request' })
+    }
+
+    try {
+        const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+        if (!task) {
+            return res.status(404).send('No task found with given id')
+        }
+        res.send(task)
+    } catch (error) {
+        res.status(500).send(error.message)
+    }
+
 })
 
 app.listen(port, () => {
