@@ -43,7 +43,7 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
     isValidObjectId(_id, res)
-    
+
     try {
         // mongoose will automatically convert string id into object ID
         const user = await User.findById(_id)
@@ -79,6 +79,23 @@ app.patch('/users/:id', async (req, res) => {
     } catch (e) {
         res.status(500).send(e.message)
     }
+})
+
+// Delete user by id
+app.delete('/users/:id', async (req, res) => {
+    const _id = req.params.id
+    isValidObjectId(_id, res)
+
+    try {
+        const user = await User.findByIdAndDelete(_id)
+        if (!user) {
+            return res.status(404).send('No user found by given id')
+        }
+        res.send(user)
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+
 })
 
 // Post new task
@@ -140,6 +157,23 @@ app.patch('/tasks/:id', async (req, res) => {
         res.send(task)
     } catch (error) {
         res.status(500).send(error.message)
+    }
+
+})
+
+// Delete task by id
+app.delete('/tasks/:id', async (req, res) => {
+    const _id = req.params.id
+    isValidObjectId(_id, res)
+
+    try {
+        const task = await Task.findByIdAndDelete(_id)
+        if (!task) {
+            return res.status(404).send('No task found by given id')
+        }
+        res.send(task)
+    } catch (e) {
+        res.status(500).send(e.message)
     }
 
 })
