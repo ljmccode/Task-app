@@ -42,9 +42,8 @@ app.get('/users', async (req, res) => {
 // Fetch user by id
 app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
-    if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID') 
-    }
+    isValidObjectId(_id, res)
+    
     try {
         // mongoose will automatically convert string id into object ID
         const user = await User.findById(_id)
@@ -60,6 +59,7 @@ app.get('/users/:id', async (req, res) => {
 // Update user by id
 app.patch('/users/:id', async (req, res) => {
     const _id = req.params.id
+    isValidObjectId(_id, res)
 
     // grabs an array of keys from requested updates & determines if user can update
     const updates = Object.keys(req.body)
@@ -70,9 +70,6 @@ app.patch('/users/:id', async (req, res) => {
         return res.status(400).send({ error: 'Invalid update request' })
     }
 
-    if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID') 
-    }
     try {
         const user = await User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
         if (!user) {
@@ -109,9 +106,7 @@ app.get('/tasks', async (req, res) => {
 // Fetch task by id
 app.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
-    if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID')
-    }
+    isValidObjectId(_id, res)
 
     try {
         const task = await Task.findById(_id)
