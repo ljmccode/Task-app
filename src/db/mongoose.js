@@ -23,3 +23,23 @@ const me = new User({
 me.save()
     .then(() => console.log(me))
     .catch((error) => console.log(error.message))
+
+// if collection name not provided, collection will be deduced by
+// taking the first arguemnt and  making it lowercase & plural
+const Task = mongoose.model('Task', {
+    description: {
+        type: String
+    }, 
+    completed: {
+        type: Boolean
+    }
+})
+
+const toDo = new Task({
+    description: 'Go to the vet',
+    completed: false
+})
+
+toDo.save()
+    .then(() => console.log(toDo))
+    .catch((error) => console.log(error.message))
