@@ -59,20 +59,22 @@ me.save()
 
 // if collection name not provided, collection will be deduced by
 // taking the first arguemnt and  making it lowercase & plural
-// const Task = mongoose.model('Task', {
-//     description: {
-//         type: String
-//     }, 
-//     completed: {
-//         type: Boolean
-//     }
-// })
+const Task = mongoose.model('Task', {
+    description: {
+        type: String,
+        required: true,
+        trim: true
+    }, 
+    completed: {
+        type: Boolean, 
+        default: false
+    }
+})
 
-// const toDo = new Task({
-//     description: 'Go to the vet',
-//     completed: false
-// })
+const toDo = new Task({
+    description: 'Sing in the rain'
+})
 
-// toDo.save()
-//     .then(() => console.log(toDo))
-//     .catch((error) => console.log(error.message))
+toDo.save()
+    .then(() => console.log(toDo))
+    .catch((error) => console.log(error.message)) 
