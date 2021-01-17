@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 // if collection name not provided, collection will be deduced by
 // taking the first arguemnt and  making it lowercase & plural
 const Task = mongoose.model('Task', {
@@ -10,4 +12,6 @@ const Task = mongoose.model('Task', {
         type: Boolean, 
         default: false
     }
-});
+})
+
+module.exports = Task;
