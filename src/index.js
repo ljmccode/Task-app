@@ -37,7 +37,7 @@ app.get('/users', async (req, res) => {
 app.get('/users/:id', async (req, res) => {
     const _id = req.params.id
     if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID!') 
+        return res.status(400).send('Invalid ID') 
     }
     try {
         // mongoose will automatically convert string id into object ID
@@ -47,9 +47,37 @@ app.get('/users/:id', async (req, res) => {
         }
         res.send(user)
     } catch (error) {
-        res.status(500).send()
+        res.status(500).send(error.message)
     }
 })
+
+// Update user by id
+app.patch('/users/:id', async (req, res) => {
+    const _id = req.params.id
+
+    // grabs an array of keys from requested updates & determines if user can update
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({ error: 'Invalid updates' })
+    }
+
+    if (!mongoose.isValidObjectId(_id)){
+        return res.status(400).send('Invalid ID') 
+    }
+    try {
+        const user = await User.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+        if (!user) {
+            return res.status(404).send('No user found by id')
+        }
+        res.send(user)
+    } catch (e) {
+        res.status(500).send(e.message)
+    }
+})
+
 
 // Post new task
 app.post('/tasks', async (req, res) => {
@@ -77,7 +105,7 @@ app.get('/tasks', async (req, res) => {
 app.get('/tasks/:id', async (req, res) => {
     const _id = req.params.id
     if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID!')
+        return res.status(400).send('Invalid ID')
     }
 
     try {
