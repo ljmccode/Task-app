@@ -49,9 +49,23 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+// instance methods will use this keyword so can't use arrow function
+// these methods are accessible on the instance (aka the specific user here) 
+
+// when a mongoose doc is passed to res.send, mongoose converts the object to JSON
+// The toJSON method customizes the object that mongoose will send
+userSchema.methods.toJSON = function() {
+    const user = this
+    // give the raw profile data
+    const userObject = user.toObject()
+    // don't want to send private/senstive data in the response
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
+}
+
 // generates token
-// will use this keyword so can't use arrow function
-// our methods are accessible on the instances sometimes instance methods
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign( {_id:user._id.toString() }, 'thisisthesecret');
