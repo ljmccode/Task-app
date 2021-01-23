@@ -26,8 +26,9 @@ router.post('/users/login', async (req, res) => {
         // creating our own function findByCredentials
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
+        
         res.send({ user, token })
-    } catch (error) {
+    } catch (error) { 
         res.status(400).send()
     }
 })
@@ -63,25 +64,6 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 router.get('/users/me', auth, async (req, res) => {
     // gets req.user from middleware
     res.send(req.user)
-})
-
-// Fetch user by id
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
-    if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID') 
-    }
-
-    try {
-        // mongoose will automatically convert string id into object ID
-        const user = await User.findById(_id)
-        if (!user) {
-            return res.status(404).send('User not found')
-        }
-        res.send(user)
-    } catch (error) {
-        res.status(500).send(error.message)
-    }
 })
 
 // Update user by id
