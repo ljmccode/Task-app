@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose'); 
-const User = require('../models/user')
-const router = new express.Router()
+const User = require('../models/user');
+const auth = require('../middleware/auth')
+const router = new express.Router();
 
 // ******************************
 // User REST API Endpoints
@@ -19,6 +20,7 @@ router.post('/users', async (req, res)=> {
     }
 });
 
+// Log in user
 router.post('/users/login', async (req, res) => {
     try {
         // creating our own function findByCredentials
@@ -30,14 +32,10 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-// Fetch all users
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.find({})
-        res.send(users)
-    } catch(error) {
-        res.status(500).send(error.message)
-    } 
+// Fetch auth user
+router.get('/users/me', auth, async (req, res) => {
+    // gets req.user from middleware
+    res.send(req.user)
 })
 
 // Fetch user by id
