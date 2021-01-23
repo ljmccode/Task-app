@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const User = mongoose.model('User', {
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -39,5 +39,18 @@ const User = mongoose.model('User', {
         }
     }
 })
+
+userSchema.pre('save', async function (next) {
+    // this gives us access to the individual user that's about to be saved
+    const user = this;
+
+    console.log('just before saving!')
+
+    // if next isn't called, function woudl run forever thinking we're still
+    // running some code before we save the user
+    next()
+})
+
+const User = mongoose.model('User', userSchema)
 
 module.exports = User
