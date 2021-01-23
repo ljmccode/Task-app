@@ -32,6 +32,23 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
+// Log out user
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        // filter out the token that was used for that specific login
+        // A user may have many different tokens for multiple devices and we only 
+        // want to log them out for that specific device
+        req.user.tokens = req.user.tokens.filter(token => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send({ message: 'User logged out' })
+    } catch (e) {
+        res.status(500).send(e)
+    }   
+    
+})
+
 // Fetch auth user
 router.get('/users/me', auth, async (req, res) => {
     // gets req.user from middleware
