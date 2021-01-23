@@ -100,19 +100,13 @@ router.patch('/users/:id', async (req, res) => {
 })
 
 // Delete user by id
-router.delete('/users/:id', async (req, res) => {
-    const _id = req.params.id
-    if (!mongoose.isValidObjectId(_id)){
-        return res.status(400).send('Invalid ID') 
-    }
-
+router.delete('/users/me', auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(_id)
-        if (!user) {
-            return res.status(404).send('No user found by given id')
-        }
-        res.send(user)
-    } catch (e) {
+        // remove the user who is authenticated
+        // we have req.user from the auth middleware
+        await req.user.remove()
+        res.send(req.user)
+    } catch (e) { 
         res.status(500).send(e.message)
     }
 
