@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -44,13 +45,18 @@ userSchema.pre('save', async function (next) {
     // this gives us access to the individual user that's about to be saved
     const user = this;
 
+    // will be true when user is first created and when its updated
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8)
+    }
+
     console.log('just before saving!')
 
     // if next isn't called, function woudl run forever thinking we're still
     // running some code before we save the user
     next()
 })
-
+ 
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
