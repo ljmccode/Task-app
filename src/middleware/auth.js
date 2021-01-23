@@ -16,6 +16,7 @@ const auth = async (req, res, next) => {
 
         // store information of user we found into req header 
         // will provide user info to the route handler so it doesn't have to search for the user again
+        req.token = token
         req.user = user
         next();
     } catch (e) {

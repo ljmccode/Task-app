@@ -56,7 +56,7 @@ userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign( {_id:user._id.toString() }, 'thisisthesecret');
 
-    // save token to the database
+    // save token to the tokens array in the database
     user.tokens = user.tokens.concat({ token });
     await user.save();
     return token;
@@ -79,7 +79,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
-// Has the plain text password before saving
+// Hash the plain text password before saving
 userSchema.pre('save', async function (next) {
     // this gives us access to the individual user that's about to be saved
     const user = this;
@@ -88,8 +88,6 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
     }
-
-    console.log('just before saving!')
 
     // if next isn't called, function woudl run forever thinking we're still
     // running some code before we save the user

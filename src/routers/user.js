@@ -32,7 +32,7 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-// Log out user
+// Log out user from currect session
 router.post('/users/logout', auth, async (req, res) => {
     try {
         // filter out the token that was used for that specific login
@@ -46,7 +46,17 @@ router.post('/users/logout', auth, async (req, res) => {
     } catch (e) {
         res.status(500).send(e)
     }   
-    
+})
+
+// Log out user from all sessions
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.status(200).send( {message: 'Logged out from all sessions'})
+    } catch(e) {
+        res.status(500).send(e)
+    }
 })
 
 // Fetch auth user
