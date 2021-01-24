@@ -15,6 +15,8 @@ const taskSchema = new mongoose.Schema({
         required : true,
         ref: 'User'
     }
+}, {
+    timestamps: true
 })
 
 // if collection name not provided, collection will be deduced by
