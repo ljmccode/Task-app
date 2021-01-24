@@ -49,6 +49,15 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+// virtual property- not actual data stored in datebase
+// it's a relationship between two entities
+// for mongoose to figure out who owns what and how they are related
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 // instance methods will use this keyword so can't use arrow function
 // these methods are accessible on the instance (aka the specific user here) 
 
