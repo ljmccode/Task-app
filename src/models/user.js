@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Task = require('./task')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -102,7 +103,8 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
-// Hash the plain text password before saving
+// Middleware
+// Hash the plain text password before saving 
 userSchema.pre('save', async function (next) {
     // this gives us access to the individual user that's about to be saved
     const user = this;
@@ -114,6 +116,15 @@ userSchema.pre('save', async function (next) {
 
     // if next isn't called, function woudl run forever thinking we're still
     // running some code before we save the user
+    next()
+})
+
+// Middleware
+// Delete user tasks when user is removed 
+userSchema.pre('remove', async function (next) {
+    const user = this;
+    await Task.deleteMany({ owner: user._id })
+
     next()
 })
  
