@@ -84,14 +84,15 @@ router.patch('/tasks/:id', auth, async (req, res) => {
 })
 
 // Delete task by id
-router.delete('/tasks/:id', async (req, res) => {
+router.delete('/tasks/:id', auth, async (req, res) => {
     const _id = req.params.id
     if (!mongoose.isValidObjectId(_id)){
         return res.status(400).send('Invalid ID') 
     }
 
     try {
-        const task = await Task.findByIdAndDelete(_id)
+        const task = await Task.findOneAndDelete({ _id, owner: req.user._id })
+
         if (!task) {
             return res.status(404).send('No task found by given id')
         }
