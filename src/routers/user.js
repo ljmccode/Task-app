@@ -103,7 +103,6 @@ router.delete('/users/me', auth, async (req, res) => {
 })
 
 const upload = multer({
-    dest: 'avatars',
     limits: {
         fileSize: 1000000
     },
@@ -115,10 +114,22 @@ const upload = multer({
     }
 })
 
-router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+// Create or update user avatar
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    // since we are not setting a destination directory in multer (dest), file can be accessed in this callback
+    // buffer contains all the binary data for that file
+    req.user.avatar = req.file.buffer
+    await req.user.save()
     res.send()
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
+})
+
+// Delete user avatar
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    req.user.avatar = undefined
+    await req.user.save()
+    res.send()
 })
 
 
