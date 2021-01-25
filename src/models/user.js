@@ -73,9 +73,10 @@ userSchema.methods.toJSON = function () {
     const user = this
     // give the raw profile data
     const userObject = user.toObject()
-    // don't want to send private/senstive data in the response
+    // don't want to send private/senstive/unneeded data in the response
     delete userObject.password
     delete userObject.tokens
+    delete userObject.avatar
 
     return userObject
 }

@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const mongoose = require('mongoose'); 
+const sharp = require('sharp')
 const User = require('../models/user');
 const auth = require('../middleware/auth');
 const router = new express.Router();
@@ -116,9 +116,12 @@ const upload = multer({
 
 // Create or update user avatar
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-    // since we are not setting a destination directory in multer (dest), file can be accessed in this callback
-    // buffer contains all the binary data for that file
-    req.user.avatar = req.file.buffer
+    // since we are not setting a destination directory in multer (dest), 
+    // file can be accessed in this callback via req.file.buffer
+
+    // sharp allows for auto-cropping and image formatting
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+    req.user.avatar = buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) => {
@@ -141,7 +144,7 @@ router.get('/users/:id/avatar', async (req, res) => {
             throw new Error()
         }
         // set response header
-        await res.set('Content-Type', 'image/jpg')
+        await res.set('Content-Type', 'image/png')
         res.send(user.avatar)
     } catch (e) {
         res.status(404).send()
