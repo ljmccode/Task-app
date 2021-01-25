@@ -1,8 +1,9 @@
 const express = require('express');
 const multer = require('multer');
-const mongoose = require('mongoose'); 
+const sharp = require('sharp')
 const User = require('../models/user');
 const auth = require('../middleware/auth');
+const { sendWelcomeEmail, sendCancellationEmail } = require('../emails/account')
 const router = new express.Router();
 
 // ******************************
@@ -11,13 +12,14 @@ const router = new express.Router();
 
 // Post new user
 router.post('/users', async (req, res)=> {
-    const user = new User(req.body)
+    const user = new User(req.body);
     try {
-        await user.save()
+        await user.save();;
+        sendWelcomeEmail(user.email, user.name);
         const token = await user.generateAuthToken();
-        res.status(201).send({ user, token })
+        res.status(201).send({ user, token });
     } catch (error) {
-        res.status(400).send(error.message)
+        res.status(400).send(error.message);
     }
 });
 
@@ -95,6 +97,7 @@ router.delete('/users/me', auth, async (req, res) => {
         // remove the user who is authenticated
         // we have req.user from the auth middleware
         await req.user.remove()
+        sendCancellationEmail(req.user.email, req.user.name);
         res.send(req.user)
     } catch (e) { 
         res.status(500).send(e.message)
@@ -116,9 +119,12 @@ const upload = multer({
 
 // Create or update user avatar
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-    // since we are not setting a destination directory in multer (dest), file can be accessed in this callback
-    // buffer contains all the binary data for that file
-    req.user.avatar = req.file.buffer
+    // since we are not setting a destination directory in multer (dest), 
+    // file can be accessed in this callback via req.file.buffer
+
+    // sharp allows for auto-cropping and image formatting
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+    req.user.avatar = buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) => {
@@ -141,7 +147,7 @@ router.get('/users/:id/avatar', async (req, res) => {
             throw new Error()
         }
         // set response header
-        await res.set('Content-Type', 'image/jpg')
+        await res.set('Content-Type', 'image/png')
         res.send(user.avatar)
     } catch (e) {
         res.status(404).send()
