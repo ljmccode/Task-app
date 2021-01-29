@@ -69,7 +69,7 @@ router.get('/users/me', auth, async (req, res) => {
     res.send(req.user)
 })
 
-// Update user by id
+// Update user
 router.patch('/users/me', auth, async (req, res) => {
     
     // grabs an array of keys from requested updates & determines if user can update
@@ -91,7 +91,7 @@ router.patch('/users/me', auth, async (req, res) => {
     }
 })
 
-// Delete user by id
+// Delete user
 router.delete('/users/me', auth, async (req, res) => {
     try {
         // remove the user who is authenticated
