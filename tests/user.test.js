@@ -1,27 +1,10 @@
 const request = require ('supertest');
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const app = require('../src/app');
 const User = require('../src/models/user');
+const { userOne, userOneId, setUpDatabase } = require('./fixtures/db')
 
-
-const userOneId = new mongoose.Types.ObjectId()
-
-// Good to have a test user up above to be able to use over and over
-const userOne = {
-    _id: userOneId,
-    name: 'Mike',
-    email: 'mike@example.com',
-    password: 'thisisapasstotheword',
-    tokens: [{
-        token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
-    }]
-}
-
-beforeEach(async () => {
-    await User.deleteMany()
-    await new User(userOne).save()
-})
+beforeEach(setUpDatabase)
 
 afterAll(async () => {
     await mongoose.connection.close()
