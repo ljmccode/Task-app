@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken')
 const User = require('../../src/models/user')
 const Task = require('../../src/models/task')
 
-
+// Below are fixtures: a fixed state of a set of objects used as a baseline for running tests
 const userOneId = new mongoose.Types.ObjectId()
-// Good to have a test user up above to be able to use over and over
 const userOne = {
     _id: userOneId,
     name: 'Mike',
@@ -15,9 +14,7 @@ const userOne = {
         token: jwt.sign({ _id: userOneId }, process.env.JWT_SECRET)
     }]
 }
-
 const userTwoId = new mongoose.Types.ObjectId()
-// Good to have a test user up above to be able to use over and over
 const userTwo = {
     _id: userTwoId,
     name: 'Jemma',
@@ -49,6 +46,7 @@ const taskThree = {
     owner: userTwo._id
 }
 
+// tears down database and then sets back up
 const setUpDatabase = async () => {
     await User.deleteMany()
     await Task.deleteMany()

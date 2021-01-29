@@ -20,7 +20,7 @@ const taskSchema = new mongoose.Schema({
 })
 
 // if collection name not provided, collection will be deduced by
-// taking the first arguemnt and  making it lowercase & plural
+// taking the first arguement and making it lowercase & plural
 const Task = mongoose.model('Task', taskSchema)
 
 module.exports = Task;

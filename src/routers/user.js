@@ -26,7 +26,7 @@ router.post('/users', async (req, res)=> {
 // Log in user
 router.post('/users/login', async (req, res) => {
     try {
-        // creating our own function findByCredentials
+        // creating our own function findByCredentials to find user and check password
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
         
@@ -39,9 +39,9 @@ router.post('/users/login', async (req, res) => {
 // Log out user from currect session
 router.post('/users/logout', auth, async (req, res) => {
     try {
-        // filter out the token that was used for that specific login
-        // A user may have many different tokens for multiple devices and we only 
+        // A user may have many different tokens for multiple devices and we only  
         // want to log them out for that specific device
+        // this assigns req.user.token to an array of tokens that doesn't include current one
         req.user.tokens = req.user.tokens.filter(token => {
             return token.token !== req.token
         })
@@ -65,7 +65,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 
 // Fetch auth user
 router.get('/users/me', auth, async (req, res) => {
-    // gets req.user from middleware
+    // auth middleware adds user property to request so we can use that
     res.send(req.user)
 })
 
@@ -82,7 +82,7 @@ router.patch('/users/me', auth, async (req, res) => {
     }
 
     try {
-        // grabs req.user provided from auth middlewear
+        // grabs req.user provided from auth middleware
         updates.forEach(update => req.user[update] = req.body[update])
         await req.user.save()
         res.send(req.user)
@@ -95,7 +95,6 @@ router.patch('/users/me', auth, async (req, res) => {
 router.delete('/users/me', auth, async (req, res) => {
     try {
         // remove the user who is authenticated
-        // we have req.user from the auth middleware
         await req.user.remove()
         sendCancellationEmail(req.user.email, req.user.name);
         res.send(req.user)
@@ -113,6 +112,7 @@ const upload = multer({
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
             return cb(new Error ('Please upload an image'))
         }
+        // error is undefined and accept file is true
         cb(undefined, true)
     }
 })

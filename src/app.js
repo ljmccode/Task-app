@@ -5,7 +5,7 @@ const taskRouter = require('./routers/task')
 
 const app = express()
 
-// Automatically parses JSON to an object
+// Bind application-level middleware to an instance of the app object
 app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
